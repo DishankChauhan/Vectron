@@ -9,7 +9,10 @@ A high-performance, lightweight vector database built in Rust with text-to-embed
 
 ## 🎬 Demo
 
+## 📹 Demo Video
+
 [![Watch the demo](https://cdn.loom.com/sessions/thumbnails/e2880d78d93f4cc18944c1ee5674a874-with-play.gif)](https://www.loom.com/share/e2880d78d93f4cc18944c1ee5674a874)
+
 
 ## ✨ Features
 
