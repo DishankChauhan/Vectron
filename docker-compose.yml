@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  vectron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/vectron/data
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info 

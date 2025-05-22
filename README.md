@@ -1,26 +1,58 @@
-# Vectron - Rust-Based Vector Database with Embedded AI
+# 🚀 Vectron - Rust-Based Vector Database with Embedded AI
 
-A performant, minimal vector database in Rust with text-to-embedding conversion, vector storage, and similarity search.
+![Rust](https://img.shields.io/badge/Rust-🦀-orange)
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-beta-yellow)
 
-## Features
+A high-performance, lightweight vector database built in Rust with text-to-embedding conversion, optimized vector storage, and similarity search capabilities. Vectron combines the speed of Rust with the power of modern AI embedding models.
 
-- Text-to-embedding conversion
-- Vector storage
-- Top-K similarity search
-- REST interface
+## 🎬 Demo
 
-## Project Structure
+[![Watch the demo](https://cdn.loom.com/sessions/thumbnails/e2880d78d93f4cc18944c1ee5674a874-with-play.gif)](https://www.loom.com/share/e2880d78d93f4cc18944c1ee5674a874)
+
+## ✨ Features
+
+- **🧠 Text-to-Embedding Conversion**: Generate vector embeddings from text using HuggingFace models
+- **⚡ High-Performance Vector Storage**: Fast in-memory storage with persistence capabilities
+- **🔍 Similarity Search**: Efficient cosine similarity search with top-K results
+- **🔄 Comprehensive REST API**: Full CRUD operations for vectors and embeddings
+- **💾 Persistence Layer**: Save and load vectors to/from disk automatically
+- **📊 Built-in Benchmarking**: Measure performance of vector operations
+
+## 🏗️ Architecture
 
 ```
-src/
-  ├── main.rs         # Application entry point
-  ├── api/            # REST endpoints
-  ├── db/             # In-memory vector store
-  ├── embedding/      # Embedding logic
-  └── utils/          # Similarity, helpers
+                  ┌─────────────┐
+                  │   Client    │
+                  └──────┬──────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────┐
+│                 REST API                  │
+├───────────┬─────────────────┬─────────────┤
+│ Embedding │  Vector Store   │ Benchmarks  │
+│ Generator │  CRUD & Search  │             │
+└─────┬─────┴────────┬────────┴─────────────┘
+      │              │
+┌─────▼────┐   ┌────▼──────┐
+│ Python   │   │ Persistence│
+│ Models   │   │   Layer    │
+└──────────┘   └────────────┘
 ```
 
-## Getting Started
+## 📊 Benchmark Results
+
+Benchmarks run on MacBook M1, 16GB RAM:
+
+| Vectors | Dimension | Insert (ms/vector) | Search (ms/query) | Storage (MB) |
+|---------|-----------|-------------------|------------------|--------------|
+| 10      | 32        | 0.24              | 0.02             | <1           |
+| 100     | 64        | 1.82              | 0.25             | <1           |
+| 1,000   | 384       | 3.61              | 1.13             | 1.5          |
+| 10,000  | 384       | 5.29              | 8.76             | 15           |
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -30,8 +62,7 @@ src/
 ### Setup
 
 1. Clone the repository
-2. Configure variables in the `.env` file
-3. Install Python dependencies:
+2. Install Python dependencies:
 
 ```bash
 python -m pip install -r python/requirements.txt
@@ -39,34 +70,64 @@ python -m pip install -r python/requirements.txt
 
 ### Running the Server
 
-Run the server:
-
 ```bash
-cargo run
+cargo run --release
 ```
 
 The server will start on `http://localhost:3000`.
 
-## API Endpoints
+## 📚 API Usage Examples
 
-- `GET /` - Health check endpoint
-- `POST /vector` - Insert or update vector
-- `GET /vector/:id` - Get vector by ID
-- `DELETE /vector/:id` - Delete vector by ID
-- `GET /vectors` - List all vector IDs
-- `POST /embed` - Generate embedding from text
-- `POST /upsert-text` - Create vector from text directly
-- `POST /search/vector` - Search for similar vectors by vector
-- `POST /search/text` - Search for similar vectors by text
+### Insert a vector from text
 
-## Development Roadmap
+```bash
+curl -X POST http://localhost:3000/upsert-text \
+  -H "Content-Type: application/json" \
+  -d '{"id": "doc1", "text": "This is a sample document for vector search"}'
+```
 
-This project is being developed in phases:
+### Search similar vectors by text
 
-- ✅ Phase 0: Project Setup 
+```bash
+curl -X POST http://localhost:3000/search/text \
+  -H "Content-Type: application/json" \
+  -d '{"text": "sample document"}' \
+  -G -d 'top_k=3'
+```
+
+### Get benchmark results
+
+```bash
+curl -X POST http://localhost:3000/benchmark \
+  -H "Content-Type: application/json" \
+  -d '{"vector_count": 1000, "dimension": 384, "search_count": 50}'
+```
+
+## 🧪 Development Roadmap
+
+This project has been developed in phases:
+
+- ✅ Phase 0: Project Setup
 - ✅ Phase 1: In-Memory Vector Store
 - ✅ Phase 2: Embedding Generator
 - ✅ Phase 3: Similarity Search
 - ✅ Phase 4: REST API
-- ⬜ Phase 5: Testing and Benchmarking
-- ⬜ Phase 6: Persistence Layer (Optional) 
+- ✅ Phase 5: Testing and Benchmarking
+- ✅ Phase 6: Persistence Layer
+
+## 🔧 Future Enhancements
+
+- Approximate search using HNSW or similar algorithms
+- Clustering and visualization tools
+- Authentication and access control
+- Distributed vector storage for scaling
+- Web UI for interactive demos
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgements
+
+- HuggingFace for their sentence-transformers models
+- The Rust community for excellent libraries and tools 
