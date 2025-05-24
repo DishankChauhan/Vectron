@@ -14,7 +14,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 
 # Build the project
-RUN cargo build --release
+RUN cargo build --release --bin vectron
 
 FROM python:3.11-slim
 

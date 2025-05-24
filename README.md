@@ -14,68 +14,102 @@ A high-performance, lightweight vector database built in Rust with text-to-embed
 
 ## ✨ Features
 
-- **🧠 Text-to-Embedding Conversion**: Generate vector embeddings from text using HuggingFace models
+- **🧠 Multi-Model Embedding Support**: 
+  - ✅ Local models (Sentence Transformers: MiniLM, BGE, etc.)
+  - ✅ Remote APIs (OpenAI, Cohere, HuggingFace)
+  - ✅ Model registry with configuration
+  - ✅ Benchmarking and model comparison
+- **🔀 Decoupled Architecture**:
+  - ✅ Microservice for embedding generation
+  - ✅ Standalone vector database service
+  - ✅ Dockerized for easy deployment
 - **⚡ High-Performance Vector Storage**: Fast in-memory storage with persistence capabilities
 - **🔍 Similarity Search**: Efficient cosine similarity search with top-K results
 - **🔄 Comprehensive REST API**: Full CRUD operations for vectors and embeddings
 - **💾 Persistence Layer**: Save and load vectors to/from disk automatically
-- **📊 Built-in Benchmarking**: Measure performance of vector operations
+- **📊 Built-in Benchmarking**: Measure performance of vector operations and embedding models
 
 ## 🏗️ Architecture
 
 ```
-                  ┌─────────────┐
-                  │   Client    │
-                  └──────┬──────┘
-                         │
-                         ▼
-┌───────────────────────────────────────────┐
-│                 REST API                  │
-├───────────┬─────────────────┬─────────────┤
-│ Embedding │  Vector Store   │ Benchmarks  │
-│ Generator │  CRUD & Search  │             │
-└─────┬─────┴────────┬────────┴─────────────┘
-      │              │
-┌─────▼────┐   ┌────▼──────┐
-│ Python   │   │ Persistence│
-│ Models   │   │   Layer    │
-└──────────┘   └────────────┘
+                   ┌─────────────┐
+                   │   Client    │
+                   └──────┬──────┘
+                          │
+                          ▼
+ ┌───────────────────────────────────────────┐
+ │             Vectron REST API              │
+ ├───────────┬─────────────────┬─────────────┤
+ │ Embedding │  Vector Store   │ Benchmarks  │
+ │ Client    │  CRUD & Search  │             │
+ └─────┬─────┴────────┬────────┴─────────────┘
+       │ HTTP         │
+       ▼              │
+┌──────────────┐  ┌───▼───────┐
+│  Embedding   │  │Persistence│
+│  Service     │  │  Layer    │
+└──────┬───────┘  └───────────┘
+       │
+       ▼
+┌──────────────┐
+│ AI Models    │
+│ Registry     │
+└──────────────┘
 ```
 
-## 📊 Benchmark Results
+## 📊 Model Benchmark Results
 
-Benchmarks run on MacBook M1, 16GB RAM:
+Example benchmark comparing embedding models:
 
-| Vectors | Dimension | Insert (ms/vector) | Search (ms/query) | Storage (MB) |
-|---------|-----------|-------------------|------------------|--------------|
-| 10      | 32        | 0.24              | 0.02             | <1           |
-| 100     | 64        | 1.82              | 0.25             | <1           |
-| 1,000   | 384       | 3.61              | 1.13             | 1.5          |
-| 10,000  | 384       | 5.29              | 8.76             | 15           |
+| Model ID    | Provider           | Dimensions | Processing Time (s) | Contrast Score |
+|-------------|-------------------|------------|---------------------|----------------|
+| minilm      | sentence-transformers | 384     | 0.012              | 0.068          |
+| bge-small   | sentence-transformers | 384     | 0.015              | 0.082          |
+| openai-small| openai            | 1536       | 0.321              | 0.103          |
+| cohere-english | cohere         | 384        | 0.456              | 0.089          |
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Running with Docker
 
-- Rust (latest stable version)
-- Python 3.8+ (for embedding generation)
+The easiest way to get started is using Docker Compose:
 
-### Setup
+```bash
+docker-compose up
+```
+
+This will start both the Vectron database and the embedding service.
+
+### Manual Setup
 
 1. Clone the repository
 2. Install Python dependencies:
 
 ```bash
-python -m pip install -r python/requirements.txt
+cd python/embedding_service
+pip install -r requirements.txt
 ```
 
-### Running the Server
+3. Copy the environment template and add your API keys:
+
+```bash
+cp env.template .env
+# Edit .env with your OpenAI, Cohere, and HuggingFace API keys
+```
+
+4. Start the embedding service:
+
+```bash
+python -m uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+5. In a new terminal, build and run Vectron:
 
 ```bash
 cargo run --release
 ```
 
-The server will start on `http://localhost:3000`.
+The Vectron API will be available at `http://localhost:3000` and the embedding service at `http://localhost:8000`.
 
 ## 📚 API Usage Examples
 
@@ -92,29 +126,33 @@ curl -X POST http://localhost:3000/upsert-text \
 ```bash
 curl -X POST http://localhost:3000/search/text \
   -H "Content-Type: application/json" \
-  -d '{"text": "sample document"}' \
+  -d '{"text": "sample document", "model_id": "openai-small"}' \
   -G -d 'top_k=3'
 ```
 
-### Get benchmark results
+### List available embedding models
 
 ```bash
-curl -X POST http://localhost:3000/benchmark \
-  -H "Content-Type: application/json" \
-  -d '{"vector_count": 1000, "dimension": 384, "search_count": 50}'
+curl http://localhost:8000/models
+```
+
+### Benchmark embedding models
+
+```bash
+./benchmark_models.sh
 ```
 
 ## 🧪 Development Roadmap
 
 This project has been developed in phases:
 
-- ✅ Phase 0: Project Setup
-- ✅ Phase 1: In-Memory Vector Store
-- ✅ Phase 2: Embedding Generator
-- ✅ Phase 3: Similarity Search
-- ✅ Phase 4: REST API
-- ✅ Phase 5: Testing and Benchmarking
-- ✅ Phase 6: Persistence Layer
+- ✅ Phase 0: Project Setup - Initial project structure
+- ✅ Phase 1: Embedding Service - Decoupled embedding microservice
+- ✅ Phase 2: Multi-Model Support - Multiple embedding providers and benchmarking
+- 🔄 Phase 3: Advanced Vector Storage - Optimized in-memory storage with persistence
+- 🔄 Phase 4: Search Algorithms - Similarity search optimization
+- 🔄 Phase 5: Advanced Features - Clustering and segmentation
+- 🔄 Phase 6: Performance Tuning - Testing and benchmarking
 
 ## 🔧 Future Enhancements
 
@@ -131,4 +169,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🙏 Acknowledgements
 
 - HuggingFace for their sentence-transformers models
-- The Rust community for excellent libraries and tools 
+- OpenAI, Cohere, and HuggingFace for embedding APIs
+- The Rust community for excellent libraries and tools

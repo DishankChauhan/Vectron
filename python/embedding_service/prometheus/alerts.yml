@@ -1,0 +1,65 @@
+groups:
+  - name: embedding-service-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(embedding_request_count{status="error"}[5m])) / sum(rate(embedding_request_count[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate in embedding service"
+          description: "Error rate is above 5% for the last 2 minutes."
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, sum(rate(embedding_request_latency_seconds_bucket[5m])) by (le)) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time in embedding service"
+          description: "95th percentile response time is above 5 seconds for the last 2 minutes."
+
+      - alert: HighMemoryUsage
+        expr: embedding_system_memory_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage in embedding service"
+          description: "Memory usage is above 90% for the last 5 minutes."
+
+      - alert: HighCpuUsage
+        expr: embedding_system_cpu_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage in embedding service"
+          description: "CPU usage is above 80% for the last 5 minutes."
+
+      - alert: ServiceDown
+        expr: up{job="embedding-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Embedding service is down"
+          description: "Embedding service has been down for more than 1 minute."
+
+      - alert: ApiKeyInvalid
+        expr: embedding_api_key_status == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Invalid API key detected"
+          description: "One or more provider API keys are invalid."
+
+      - alert: ModelLoadFailure
+        expr: embedding_model_loaded == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Model failed to load"
+          description: "One or more embedding models failed to load." 

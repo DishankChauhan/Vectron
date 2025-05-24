@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  embedding-service:
+    build:
+      context: ./python/embedding_service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - PORT=8000
+      - LOG_LEVEL=INFO
+      # API keys (replace with your actual keys or use .env file)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - COHERE_API_KEY=${COHERE_API_KEY:-}
+      - HF_API_TOKEN=${HF_API_TOKEN:-}
+    volumes:
+      - ./model_cache:/app/model_cache
+
   vectron:
     build:
       context: .
@@ -13,17 +30,17 @@ services:
     environment:
       - RUST_LOG=info
       - EMBEDDING_SERVICE_URL=http://embedding-service:8000
+      - EMBEDDING_MODEL=minilm  # Optional: specify default model
     depends_on:
       - embedding-service
 
-  embedding-service:
+  dashboard:
     build:
-      context: ./python/embedding_service
+      context: ./web/dashboard
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "3001:3001"
     restart: unless-stopped
-    environment:
-      - PORT=8000
-    volumes:
-      - ./python/embedding_service:/app
+    depends_on:
+      - embedding-service
+      - vectron

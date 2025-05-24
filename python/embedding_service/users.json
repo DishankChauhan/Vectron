@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "username": "admin",
+    "email": "admin@example.com",
+    "full_name": "Administrator",
+    "disabled": false,
+    "hashed_password": "$2b$12$UUkgD9rUwhW1zPwK9C9wreLbctE2eZt5XISxlrGnubAxcoVJHtWea",
+    "role": "admin",
+    "api_keys": []
+  },
+  "testadmin": {
+    "username": "testadmin",
+    "email": "test@example.com",
+    "full_name": null,
+    "disabled": false,
+    "hashed_password": "$2b$12$a47nNrb2g1NukkJO3Cg17.Fr57YKyB1tZYqobcZnKmbbSD7DqPkwW",
+    "role": "admin",
+    "api_keys": [
+      "vectron_6Tp4PgdmhOQ0-MXwuVEPl0NqRRRsxzzxW3sji8S0IVs"
+    ]
+  }
+}
