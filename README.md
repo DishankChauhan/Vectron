@@ -30,7 +30,8 @@ A high-performance, lightweight vector database built in Rust with text-to-embed
 - **📊 Built-in Benchmarking**: Measure performance of vector operations and embedding models
 
 ## 🏗️ Architecture
-![Vectron (architecture diagram)](https://github.com/user-attachments/assets/fe831d6c-5598-42e1-b0c5-7abf2d305aba)
+
+![vectron db architecture diagram](https://github.com/user-attachments/assets/e2baf42c-06aa-4925-ba4a-372d02b132d3)
 
 
 
